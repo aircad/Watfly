@@ -67,10 +67,10 @@ LeftRpm=1100;
 RightMotor.write(RightRpm);
 LeftMotor.write(LeftRpm);
 //Gains
-pGain=1;
-dGain=0.5;
-aGain=0;
-iGain=0; //NEW
+pGain=0.6;
+dGain=0.20;
+aGain=0.01;
+iGain=0.1; //NEW
 loopTime = millis();
 float velAvg[5] = {0,0,0,0,0};
 //float posAvg[5] = {0,0,0,0,0};
@@ -103,12 +103,18 @@ void loop()
         RotVelocity=(Angle-Angle_Prev)/((loopTime-prevLoopTime)*0.001);
         RotAccel=(RotVelocity-RotVelocity_Prev)/((loopTime-prevLoopTime)*0.001);
 
-        if(fabs(RotVelocity)>150)
+        if(fabs(RotVelocity)>200)
         
         {
-          RotVelocity = RotVelocity/fabs(RotVelocity)*150;
+          RotVelocity = RotVelocity/fabs(RotVelocity)*200;
         }
 
+        if(fabs(RotAccel)>2500)
+
+        {
+          RotAccel = RotAccel/fabs(RotAccel)*2500;
+        }
+        /*
         velAvg[count] = RotVelocity;
         //posAvg[count] = Angle;
         
@@ -121,13 +127,15 @@ void loop()
           avgVel+=velAvg[index];
           //avgAng+=posAvg[index];
         }
-        avgVel/=3;
+        */
+        avgVel = RotVelocity;
+        avgVel/=1;
         //avgAng/=3;
 
         angInt+=Angle*((loopTime-prevLoopTime)*0.001);//finding angle traveled in time it took to loop*0.001 cuz ms        
     
-        RightRpm=1100-(Angle*pGain)+(avgVel*dGain)-(RotAccel*aGain)-angInt*iGain;  //Edited  changed rot velocity to -
-        LeftRpm=1110+(Angle*pGain)-(avgVel*dGain)+(RotAccel*aGain)+angInt*iGain;    //Edited
+        RightRpm=1100-(Angle*pGain)-(avgVel*dGain)-(RotAccel*aGain)-angInt*iGain;  //Edited  changed rot velocity to -
+        LeftRpm=1100+(Angle*pGain)+(avgVel*dGain)+(RotAccel*aGain)+angInt*iGain;    //Edited
         
         if (RightRpm>1500) RightRpm=1500;
         if (LeftRpm>1500) LeftRpm=1500;
@@ -177,16 +185,16 @@ void loop()
          //Serial.print(RightRpm);
          //Serial.print(",");
          //Serial.print(LeftRpm);
-        // Serial.print(", ,");
-        Serial.print(Angle);
-        /*Serial.print(",");
-        Serial.print(RotVelocity*0.01);
+        //Serial.print(", ,");
+        //Serial.print(Angle);
+        //Serial.print(",");
+        //Serial.print(RotVelocity);
         Serial.print(",");
         Serial.println(avgVel);
-        Serial.print("      ");
-        Serial.print(loopTime-prevLoopTime);  
-        // Serial.print(",");     
-        // Serial.println(RotAccel*0.01);*/
-        Serial.print(" , ");
-        Serial.println(pGain);
+        //Serial.print("      ");
+        //Serial.print(loopTime-prevLoopTime);  
+        Serial.print(",");     
+        Serial.println(RotAccel);
+        //Serial.print(" , ");
+        //Serial.println(pGain);
 }
